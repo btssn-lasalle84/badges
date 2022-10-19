@@ -9,6 +9,7 @@
   - [GitHub Profile](#github-profile)
   - [Simple Icons](#simple-icons)
   - [Liens](#liens)
+
 ## Badge d'état d'un workflow GitHub Actions
 
 GitHub Actions permet d'automatiser des tâches associées à un dépôt GitHub.
@@ -80,13 +81,89 @@ Ou avec un code HTML :
 
 ![](images/makefile.png)
 
+Il est possible de générer de badge à partir du _workflow_ (cela peut être utile avec GitHub Classroom où le dépôt de départ est un _template_).
+
+Ce _workflow_ génère un badge `makefile.svg` :
+
+```yml
+name: Makefile
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
+    - name: make
+      id: make
+      continue-on-error: true
+      shell: bash
+      run: |
+        label="Makefile"
+        echo "##[set-output name=label;]${label}"
+        make
+        res=$?
+        if [ $res -eq 0 ]
+        then
+          retour="passing"
+          color="green"
+        else
+          retour="failing"
+          color="red"
+        fi
+        echo "##[set-output name=status;]${retour}"
+        echo "##[set-output name=color;]${color}"
+
+    # switch to badges branch
+    - run: |
+        git checkout badges || git checkout -b badges
+        mkdir -p .github/badges
+
+    # create badge
+    - name: badge makefile
+      uses: emibcn/badge-action@v1.2.1
+      with:
+        label: ${{ steps.make.outputs.label }}
+        status: ${{ steps.make.outputs.status || 'failing' }}
+        color: ${{ steps.make.outputs.color || 'red' }}
+        path: '.github/badges/makefile.svg'
+
+    # commit and push badges if badges have changed
+    - name: Commit changes to badge makefile
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add '.github/badges/makefile.svg'
+        git commit -m "Add/Update badge makefile" || exit 0
+        git push origin badges
+```
+
+Il suffit maintenant d'intégrer l'image du badge dans le `README.md` :
+
+```markdown
+[![Makefile badge](../../blob/badges/.github/badges/makefile.svg)](../../actions)
+```
+
+Ou avec un code HTML :
+
+```html
+<img alt="badge makefile" align="right" src="../../blob/badges/.github/badges/makefile.svg" />
+```
+
 ## Badge de points pour GitHub Classroom
 
 GitHub Classroom permet de "noter" un devoir.
 
 La notation s'établit dans un fichier `.github/classroom/autograding.json`, par exemple :
 
-```js
+```json
 {
   "tests": [
     {
