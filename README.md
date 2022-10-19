@@ -157,6 +157,8 @@ Ou avec un code HTML :
 <img alt="badge makefile" align="right" src="../../blob/badges/.github/badges/makefile.svg" />
 ```
 
+Lien : https://github.com/emibcn/badge-action
+
 ## Badge de points pour GitHub Classroom
 
 GitHub Classroom permet de "noter" un devoir.
@@ -226,6 +228,12 @@ jobs:
 ```
 
 ![](images/points-bar.svg)
+
+Liens :
+
+- https://github.com/markpatterson27/points-bar
+- https://github.com/stevenbitner/autograding
+- https://github.com/emibcn/badge-action
 
 ## Les badges badgen.net
 
